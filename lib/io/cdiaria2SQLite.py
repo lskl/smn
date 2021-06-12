@@ -72,6 +72,8 @@ def insertar_en_tabla_estacion( conexion, registro ):
 
     except sqlite3.OperationalError:
         print("Error: No se pudo añadir el registro")
+    except sqlite3.IntegrityError:
+        print( "Error de integridad de datos. ¿Ya estaba el registro en la tabla 'estacion'?" )
 
     return 0
 
@@ -89,7 +91,7 @@ if __name__ == "__main__":
     archivos = lista_archivos( dir_datos )
     archivos = archivos[:5]
 
-    print( archivos ) # Para probar
+    # print( archivos ) # Para probar
 
     # ------------------
     # Para cada archivo en la lista, leer el encabezado
