@@ -47,6 +47,9 @@ def crear_sqlite( ):
 
     return 0
 
+def insertar_en_tabla_estacion( registro ):
+    return 0
+
 
 # -----------------------------------
 # Main: para cuando se ejecute este script directamente
@@ -54,11 +57,16 @@ def crear_sqlite( ):
 if __name__ == "__main__":
 
     from cdiaria import *
+    from os.path import join
 
     archivos = lista_archivos( dir_datos )
     archivos = archivos[:5]
 
     print( archivos ) # Para probar
+
+    for arch in archivos:
+        encabezado = leer_smn_encabezado( join(dir_datos, arch) )
+        print( encabezado )
 
     crear_sqlite()
 
