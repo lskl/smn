@@ -37,6 +37,8 @@ def lista_archivos( directorio ):
 
 def leer_cdiaria( filename, path='' ):
 
+# Comentario bobo para hacer un commit
+
     return 0
 
 # -----------------------------------
