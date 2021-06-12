@@ -41,8 +41,26 @@ def crear_sqlite( ):
         print("Se creo la tabla estacion")
 
     except sqlite3.OperationalError:
-        print("La tabla ya existe")
+        print("La tabla estaciones ya existe")
 
+    try:
+        conexion.execute("""
+            create table datos_diarios (
+            numero_estacion integer,
+            dia integer,
+            mes integer,
+            anyo integer,
+            precipitacion double,
+            evaporacion double,
+            temp_max double,
+            temp_min double,
+            primary key( numero_estacion, dia, mes, anyo )
+            )
+            """)
+        print("Se creo la tabla datos_diarios")
+
+    except sqlite3.OperationalError:
+        print("La tabla datos_diarios ya existe")
     conexion.close()
 
     return 0
