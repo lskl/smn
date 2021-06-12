@@ -100,6 +100,7 @@ if __name__ == "__main__":
     for arch in archivos:
         encabezado = leer_smn_encabezado( join(dir_datos, arch) )
         insertar_en_tabla_estacion( conexion, encabezado )
+    conexion.commit()
     conexion.close()
 # ------------------
 
