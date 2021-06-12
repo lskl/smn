@@ -24,4 +24,4 @@ https://smn.conagua.gob.mx/tools/RESOURCES/Diarios/8030.txt
 En este repositorio se considera que los datos están en el directorio: "../datos". Los datos primarios en formato TXT deben ester en "/datos/datos primarios/Total de estaciones".
 
 
-
+Estamos probando el git
