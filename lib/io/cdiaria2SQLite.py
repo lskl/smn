@@ -47,7 +47,32 @@ def crear_sqlite( ):
 
     return 0
 
-def insertar_en_tabla_estacion( registro ):
+def insertar_en_tabla_estacion( conexion, registro ):
+
+    try:
+        # columnas = ['numero', 'nombre', 'estado', 'municipio', 'situacion', \
+        #             'organismo', 'cve', 'latitud', 'longitud', 'altitud']
+        # conexion.executemany("""insert into estacion (?,?)""",
+        #                      [(c, registro[c]) for c in columnas])
+
+        sql_insert = """
+            insert into estacion (
+            numero, nombre, estado, municipio, situacion,
+            organismo, cve, latitud, longitud, altitud
+            )
+            values('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')
+            """.format(
+            registro['numero'], registro['nombre'], registro['estado'],
+            registro['municipio'], registro['situacion'], registro['organismo'],
+            registro['cve'], registro['latitud'], registro['longitud'],
+            registro['altitud'])
+        # print( sql_query )
+        conexion.execute( sql_insert )
+        print("Registro añadido a la tabla Estaciones")
+
+    except sqlite3.OperationalError:
+        print("Error: No se pudo añadir el registro")
+
     return 0
 
 
@@ -59,15 +84,24 @@ if __name__ == "__main__":
     from cdiaria import *
     from os.path import join
 
+    crear_sqlite()
+
     archivos = lista_archivos( dir_datos )
     archivos = archivos[:5]
 
     print( archivos ) # Para probar
 
+    # ------------------
+    # Para cada archivo en la lista, leer el encabezado
+    # e incluirlo en la tabla de estaciones de SQLite
+    import sqlite3
+    conexion = sqlite3.connect(join(dir_sqlite, "cdiaria.db"))
+
     for arch in archivos:
         encabezado = leer_smn_encabezado( join(dir_datos, arch) )
-        print( encabezado )
+        insertar_en_tabla_estacion( conexion, encabezado )
+    conexion.close()
+# ------------------
 
-    crear_sqlite()
 
-    print('***')
+    print('Fin')
