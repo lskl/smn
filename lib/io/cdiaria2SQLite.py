@@ -65,7 +65,7 @@ def crear_sqlite( ):
 
     return 0
 
-def insertar_en_tabla_estacion( conexion, registro ):
+def insertar_en_tabla_estacion( conexion, registro, verbose=False ):
 
     try:
         # columnas = ['numero', 'nombre', 'estado', 'municipio', 'situacion', \
@@ -86,12 +86,59 @@ def insertar_en_tabla_estacion( conexion, registro ):
             registro['altitud'])
         # print( sql_query )
         conexion.execute( sql_insert )
-        print("Registro añadido a la tabla Estaciones")
+        if verbose:
+            print("Registro añadido a la tabla Estaciones")
 
     except sqlite3.OperationalError:
         print("Error: No se pudo añadir el registro")
     except sqlite3.IntegrityError:
-        print( "Error de integridad de datos. ¿Ya estaba el registro en la tabla 'estacion'?" )
+        if verbose:
+            print('-' * 30)
+            print(sql_insert)
+            print( "Error de integridad de datos. ¿Ya estaba el registro en la tabla 'estacion'?" )
+            print('-' * 30)
+        else:
+            pass
+    return 0
+
+def insertar_en_tabla_datos_diarios( conexion, datos, verbose=False ):
+
+    import pandas as pd
+
+    for index, row in datos.iterrows():
+
+
+        try:
+            # columnas = ['numero', 'nombre', 'estado', 'municipio', 'situacion', \
+            #             'organismo', 'cve', 'latitud', 'longitud', 'altitud']
+            # conexion.executemany("""insert into estacion (?,?)""",
+            #                      [(c, registro[c]) for c in columnas])
+
+            sql_insert = """
+                insert into datos_diarios (
+                numero_estacion, dia, mes, anyo, precipitacion,
+                evaporacion, temp_max, temp_min
+                )
+                values('{}','{}','{}','{}','{}','{}','{}','{}')
+                """.format(
+                row['Estacion'], row['Dia'], row['Mes'],
+                row['Anyo'], row['Precipitacion'], row['Evaporacion'],
+                row['T_max'], row['T_min'])
+            # print( sql_query )
+            conexion.execute( sql_insert )
+            if verbose:
+                print("Registro añadido a la tabla Estaciones")
+
+        except sqlite3.OperationalError:
+            print("Error: No se pudo añadir el registro")
+        except sqlite3.IntegrityError:
+            if verbose:
+                print('-'*30)
+                print( sql_insert )
+                print( "Error de integridad de datos. ¿Ya estaba el registro en la tabla 'datos_diarios'?" )
+                print('-' * 30)
+            else:
+                pass
 
     return 0
 
@@ -103,11 +150,17 @@ if __name__ == "__main__":
 
     from cdiaria import *
     from os.path import join
+    from time import time
 
+    start = time()
+
+    print('*'*50)
+    print( 'Creando tablas en la base de datos cdiaria...' )
     crear_sqlite()
+    print('*'*50)
 
     archivos = lista_archivos( dir_datos )
-    archivos = archivos[:5]
+    # archivos = archivos[50:100]
 
     # print( archivos ) # Para probar
 
@@ -117,16 +170,22 @@ if __name__ == "__main__":
     import sqlite3
     conexion = sqlite3.connect(join(dir_sqlite, "cdiaria.db"))
 
-    for arch in archivos:
+    print( 'Número de archivos en la lista:', len(archivos) )
+    print('*'*50)
+    for i, arch in enumerate(archivos):
+        print( 'Procesando archivo #'+ str(i).zfill(5)+ ': ',arch, '...', end='' )
         encabezado = leer_smn_encabezado( join(dir_datos, arch) )
-        insertar_en_tabla_estacion( conexion, encabezado )
+        insertar_en_tabla_estacion( conexion, encabezado, verbose=False )
 
         datos = leer_smn_mediciones( join(dir_datos, arch) )
-        print( datos['Estacion'] )
+        insertar_en_tabla_datos_diarios( conexion, datos, verbose=False )
+        print('\t → ok!')
+    print('*'*50)
 
     conexion.commit()
     conexion.close()
 # ------------------
 
-
-    print('Fin')
+    print( 'Fin' )
+    print( 'Tiempo total de ejecución: ', time()-start, 'segundos' )
+    print('*'*50)

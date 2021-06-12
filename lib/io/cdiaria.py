@@ -89,7 +89,7 @@ def leer_smn_encabezado(archivo):
 def leer_smn_mediciones(archivo):
     import pandas as pd
 
-    est_numero = archivo.split('/')[-1].split('.')[1]
+    est_numero = archivo.split('/')[-1].split('.')[0]
 
     df = pd.read_fwf( archivo, skiprows=18 )
 
