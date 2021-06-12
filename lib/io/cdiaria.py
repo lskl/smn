@@ -86,6 +86,57 @@ def leer_smn_encabezado(archivo):
         return encabezado
 
 
+def leer_smn_mediciones(archivo):
+    import pandas as pd
+
+    est_numero = archivo.split('/')[-1].split('.')[1]
+
+    df = pd.read_fwf( archivo, skiprows=18 )
+
+    df.columns = ['Fecha', 'Precipitacion', 'Evaporacion', 'T_max', 'T_min']
+
+    #    df = df[ df['Precipitacion'].str[0]!='-' ] # sí funciona
+    #    df = df[ df['Precipitacion'].apply( lambda x: '-' not in x) ] # sí funciona
+    mask = df['Precipitacion'].str.contains(r'-')
+    df = df[~mask]
+
+    mask = df['Fecha'].str.contains(r'\d\d/\d\d/\d\d\d\d', na=False)
+    df = df[mask]
+
+    df['Precipitacion'] = df['Precipitacion'].apply(pd.to_numeric, errors='coerce')
+    df['Evaporacion'] = df['Evaporacion'].apply(pd.to_numeric, errors='coerce')
+    df['T_max'] = df['T_max'].apply(pd.to_numeric, errors='coerce')
+    df['T_min'] = df['T_min'].apply(pd.to_numeric, errors='coerce')
+
+    # Versión para buscar errores
+    # try:
+    #     df['Dia'] = df['Fecha'].apply( lambda x: x.split('/')[0] )
+    #     df['Mes'] = df['Fecha'].apply( lambda x: x.split('/')[1] )
+    #     df['Anyo'] = df['Fecha'].apply( lambda x: x.split('/')[2] )
+    # except Exception as e:
+    #     print( e.__class__ )
+    #     for index, row in df.iterrows():
+    #         fecha = row['Fecha']
+    #         try:
+    #             dma = row['Fecha'].split('/')
+    #             if len( dma )<3:
+    #                 print( dma )
+    #         except Exception as e:
+    #             print( dma, type(dma) )
+    #             print( e.__class__ )
+    #             return 0
+
+    df['Dia'] = df['Fecha'].apply(lambda x: x.split('/')[0])
+    df['Mes'] = df['Fecha'].apply(lambda x: x.split('/')[1])
+    df['Anyo'] = df['Fecha'].apply(lambda x: x.split('/')[2])
+
+    df['Estacion'] = est_numero
+    df = df[['Estacion', 'Dia', 'Mes', 'Anyo', 'Precipitacion', 'Evaporacion', 'T_max', 'T_min']]
+
+    return df
+
+
+
 def leer_cdiaria( filename, path='' ):
 
 # Comentario bobo para hacer un commit
