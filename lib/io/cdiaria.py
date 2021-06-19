@@ -22,6 +22,8 @@ https://smn.conagua.gob.mx/tools/RESOURCES/estacion/EstacionesClimatologicas.pdf
 # -----------------------------------
 # Variables globales
 # -----------------------------------
+import pandas as pd
+
 dir_datos = '../../../datos/datos primarios/Total de estaciones'
 dir_sqlite = '../../../datos/db/sqlite'
 
@@ -38,42 +40,58 @@ def lista_archivos( directorio ):
 
 
 def leer_smn_encabezado(archivo):
+    import re
+
+    lista=[]
+    campo=""
     with open(archivo, 'rb') as f:
-        next(f).decode('latin-1')
-        next(f).decode('latin-1')
-        next(f).decode('latin-1')
-        next(f).decode('latin-1')
 
-        est_numero = next(f).decode('latin-1')
-        est_numero = int(est_numero.split(':')[1])
-        est_nombre = next(f).decode('latin-1')
-        est_nombre = est_nombre.split(':')[1].strip().strip('\n')
-        est_estado = next(f).decode('latin-1')
-        est_estado = est_estado.split(':')[1].strip().strip('\n')
-        est_municipio = next(f).decode('latin-1')
-        est_municipio = est_municipio.split(':')[1].strip().strip('\n')
-        est_situacion = next(f).decode('latin-1').strip('\n').strip()
-        est_organismo = next(f).decode('latin-1').strip('\n').strip()
-        est_cve = next(f).decode('latin-1').strip('\n').strip()
-        est_latitud = next(f).decode('latin-1')
-        est_latitud = est_latitud.split(':')[1].strip().strip('\n')
-        est_latitud = est_latitud.split('°')[0]  # elimina "°"
-        est_longitud = next(f).decode('latin-1')
-        est_longitud = est_longitud.split(':')[1].strip().strip('\n')
-        est_longitud = est_longitud.split('°')[0]  # elimina "°"
-        est_altitud = next(f).decode('latin-1')
-        est_altitud = est_altitud.split(':')[1].strip().strip('\n')
-        est_altitud = est_altitud.split(' ')[0].replace(',', '')  # elimina " msnm"
+        while(campo!="FECHA"):
+            renglon=next(f).decode('latin-1')
+            lista = lista+[renglon]
+            campo = re.search(r"FECHA", renglon)
+            if(campo):
+                campo = campo.group()
 
-        est_numero = int( est_numero )
-        est_latitud = float(est_latitud)
-        est_longitud = float(est_longitud)
-        est_altitud = float(est_altitud)
+    for renglon in lista:
+        if(re.search(r"ESTACION",renglon)):
+            est_numero = int(renglon.split(':')[1])
+        elif(re.search(r"NOMBRE",renglon)):
+            est_nombre = renglon.split(':')[1].strip().strip('\n')
+        elif(re.search(r"ESTADO",renglon)):
+            est_estado = renglon.split(':')[1].strip().strip('\n')
+        elif (re.search(r"MUNICIPIO", renglon)):
+            est_municipio = renglon.split(':')[1].strip().strip('\n')
+        elif(re.search(r"SITUACI",renglon)):
+            est_situacion = renglon.split(':')[1].strip().strip('\n')
+        elif (re.search(r"ORGANISMO", renglon)):
+            est_organismo = renglon.split(':')[1].strip().strip('\n')
+        elif(re.search(r"CVE-OMM",renglon)):
+            est_cve = renglon.split(':')[1].strip().strip('\n')
+        elif (re.search(r"LATITUD",renglon)):
+            est_latitud = renglon.split(':')[1].strip().strip('\n')
+        elif (re.search(r"LONGITUD",renglon)):
+            est_longitud = renglon.split(':')[1].strip().strip('\n')
+        elif(re.search(r"ALTITUD",renglon)):
+            est_altitud = renglon.split(':')[1].strip().strip('\n')
+        elif (re.search(r"EMISION",renglon)):
+            est_emision = renglon.split(':')[1].strip().strip('\n')
+
+    est_latitud = est_latitud.split('°')[0]  # elimina "°"
+    est_longitud = est_longitud.split('°')[0]  # elimina "°"
+    est_altitud = est_altitud.split(' ')[0].replace(',', '')  # elimina " msnm"
+
+    est_numero = int( est_numero )
+    est_latitud = float(est_latitud)
+    est_longitud = float(est_longitud)
+    est_altitud = float(est_altitud)
 
         # print(est_numero, est_nombre, est_estado, est_municipio)
         # print(est_latitud, est_longitud, est_altitud)
 
-        encabezado = {'numero': est_numero,
+#    print(len(lista))
+
+    encabezado = {'numero': est_numero,
                       'nombre': est_nombre,
                       'estado': est_estado,
                       'municipio': est_municipio,
@@ -82,16 +100,20 @@ def leer_smn_encabezado(archivo):
                       'cve': est_cve,
                       'latitud': est_latitud,
                       'longitud': est_longitud,
-                      'altitud': est_altitud}
-        return encabezado
+                      'altitud': est_altitud,
+                      'emision': est_emision}
+
+#    print(encabezado)
+
+    return encabezado, len(lista)
 
 
-def leer_smn_mediciones(archivo):
-    import pandas as pd
+def leer_smn_mediciones(archivo, n):
+    import re
 
-    est_numero = archivo.split('/')[-1].split('.')[0]
+    est_numero = re.search(r"\d+",archivo).group()
 
-    df = pd.read_fwf( archivo, skiprows=18 )
+    df = pd.read_fwf( archivo, skiprows=n )
 
     df.columns = ['Fecha', 'Precipitacion', 'Evaporacion', 'T_max', 'T_min']
 

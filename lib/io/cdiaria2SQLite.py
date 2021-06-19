@@ -32,13 +32,13 @@ def crear_sqlite( ):
             municipio text,
             situacion text,
             organismo text,
-            cve text,
+            cve_omm text,
             latitud real,
             longitud real,
-            altitud real
-            )
+            altitud real,
+            emision text)
             """)
-        print("Se creo la tabla estacion")
+        print("Se creó la tabla estación")
 
     except sqlite3.OperationalError:
         print("La tabla estaciones ya existe")
@@ -69,28 +69,31 @@ def insertar_en_tabla_estacion( conexion, registro, verbose=False ):
 
     try:
         # columnas = ['numero', 'nombre', 'estado', 'municipio', 'situacion', \
-        #             'organismo', 'cve', 'latitud', 'longitud', 'altitud']
+        #             'organismo', 'cve', 'latitud', 'longitud', 'altitud', 'emision']
         # conexion.executemany("""insert into estacion (?,?)""",
         #                      [(c, registro[c]) for c in columnas])
+
 
         sql_insert = """
             insert into estacion (
             numero, nombre, estado, municipio, situacion,
-            organismo, cve, latitud, longitud, altitud
+            organismo, cve_omm, latitud, longitud, altitud, emision
             )
-            values('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')
+            values('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')
             """.format(
             registro['numero'], registro['nombre'], registro['estado'],
             registro['municipio'], registro['situacion'], registro['organismo'],
             registro['cve'], registro['latitud'], registro['longitud'],
-            registro['altitud'])
-        # print( sql_query )
+            registro['altitud'], registro['emision'])
+
+#        print( sql_insert )
+
         conexion.execute( sql_insert )
         if verbose:
             print("Registro añadido a la tabla Estaciones")
 
     except sqlite3.OperationalError:
-        print("Error: No se pudo añadir el registro")
+        print("Error: No se pudo añadir el registro en la tabla Estaciones")
     except sqlite3.IntegrityError:
         if verbose:
             print('-' * 30)
@@ -110,7 +113,7 @@ def insertar_en_tabla_datos_diarios( conexion, datos, verbose=False ):
 
         try:
             # columnas = ['numero', 'nombre', 'estado', 'municipio', 'situacion', \
-            #             'organismo', 'cve', 'latitud', 'longitud', 'altitud']
+            #             'organismo', 'cve-omm', 'latitud', 'longitud', 'altitud']
             # conexion.executemany("""insert into estacion (?,?)""",
             #                      [(c, registro[c]) for c in columnas])
 
@@ -158,9 +161,9 @@ if __name__ == "__main__":
     print( 'Creando tablas en la base de datos cdiaria...' )
     crear_sqlite()
     print('*'*50)
-
+    print(dir_datos)
     archivos = lista_archivos( dir_datos )
-    # archivos = archivos[50:100]
+    archivos = archivos[:5]
 
     # print( archivos ) # Para probar
 
@@ -174,10 +177,11 @@ if __name__ == "__main__":
     print('*'*50)
     for i, arch in enumerate(archivos):
         print( 'Procesando archivo #'+ str(i).zfill(5)+ ': ',arch, '...', end='' )
-        encabezado = leer_smn_encabezado( join(dir_datos, arch) )
+        encabezado,n = leer_smn_encabezado( join(dir_datos, arch) )
         insertar_en_tabla_estacion( conexion, encabezado, verbose=False )
 
-        datos = leer_smn_mediciones( join(dir_datos, arch) )
+        datos = leer_smn_mediciones( join(dir_datos, arch),n )
+
         insertar_en_tabla_datos_diarios( conexion, datos, verbose=False )
         print('\t → ok!')
     print('*'*50)
