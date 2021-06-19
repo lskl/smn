@@ -163,8 +163,8 @@ if __name__ == "__main__":
     print('*'*50)
     print(dir_datos)
     archivos = lista_archivos( dir_datos )
-#    archivos = archivos[66:67]
-    archivos = [a for a in archivos if "10066" in a]
+    archivos = archivos[66:]
+#    archivos = [a for a in archivos if "10066" in a]
     # print( archivos ) # Para probar
 
     # ------------------
@@ -180,7 +180,7 @@ if __name__ == "__main__":
         encabezado,n = leer_smn_encabezado( join(dir_datos, arch) )
         insertar_en_tabla_estacion( conexion, encabezado, verbose=False )
 
-        datos = leer_smn_mediciones( join(dir_datos, arch),n )
+        datos = leer_smn_mediciones( join(dir_datos, arch),n-1 )
 
         insertar_en_tabla_datos_diarios( conexion, datos, verbose=False )
         print('\t → ok!')
