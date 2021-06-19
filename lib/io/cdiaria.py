@@ -54,27 +54,27 @@ def leer_smn_encabezado(archivo):
                 campo = campo.group()
 
     for renglon in lista:
-        if(re.search(r"ESTACION",renglon)):
+        if(re.search(r"\AESTACION",renglon)):
             est_numero = int(renglon.split(':')[1])
-        elif(re.search(r"NOMBRE",renglon)):
+        elif(re.search(r"\ANOMBRE",renglon)):
             est_nombre = renglon.split(':')[1].strip().strip('\n')
-        elif(re.search(r"ESTADO",renglon)):
+        elif(re.search(r"\AESTADO",renglon)):
             est_estado = renglon.split(':')[1].strip().strip('\n')
-        elif (re.search(r"MUNICIPIO", renglon)):
+        elif(re.search(r"\AMUNICIPIO", renglon)):
             est_municipio = renglon.split(':')[1].strip().strip('\n')
-        elif(re.search(r"SITUACI",renglon)):
+        elif(re.search(r"\ASITUACI",renglon)):
             est_situacion = renglon.split(':')[1].strip().strip('\n')
-        elif (re.search(r"ORGANISMO", renglon)):
+        elif (re.search(r"\AORGANISMO", renglon)):
             est_organismo = renglon.split(':')[1].strip().strip('\n')
-        elif(re.search(r"CVE-OMM",renglon)):
+        elif(re.search(r"\ACVE-OMM",renglon)):
             est_cve = renglon.split(':')[1].strip().strip('\n')
-        elif (re.search(r"LATITUD",renglon)):
+        elif (re.search(r"\ALATITUD",renglon)):
             est_latitud = renglon.split(':')[1].strip().strip('\n')
-        elif (re.search(r"LONGITUD",renglon)):
+        elif (re.search(r"\ALONGITUD",renglon)):
             est_longitud = renglon.split(':')[1].strip().strip('\n')
-        elif(re.search(r"ALTITUD",renglon)):
+        elif(re.search(r"\AALTITUD",renglon)):
             est_altitud = renglon.split(':')[1].strip().strip('\n')
-        elif (re.search(r"EMISION",renglon)):
+        elif (re.search(r"\AEMISION",renglon)):
             est_emision = renglon.split(':')[1].strip().strip('\n')
 
     est_latitud = est_latitud.split('°')[0]  # elimina "°"
@@ -85,6 +85,7 @@ def leer_smn_encabezado(archivo):
     est_latitud = float(est_latitud)
     est_longitud = float(est_longitud)
     est_altitud = float(est_altitud)
+
 
         # print(est_numero, est_nombre, est_estado, est_municipio)
         # print(est_latitud, est_longitud, est_altitud)
