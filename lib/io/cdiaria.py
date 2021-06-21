@@ -54,7 +54,7 @@ def leer_smn_encabezado(archivo):
                 campo = campo.group()
 
     for renglon in lista:
-        if(re.search(r"\AESTACION",renglon)):
+        if(re.search(r"\AESTACI",renglon)):
             est_numero = int(renglon.split(':')[1])
         elif(re.search(r"\ANOMBRE",renglon)):
             est_nombre = renglon.split(':')[1].strip().strip('\n')

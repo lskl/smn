@@ -163,7 +163,7 @@ if __name__ == "__main__":
     print('*'*50)
     print(dir_datos)
     archivos = lista_archivos( dir_datos )
-    archivos = archivos[66:]
+#    archivos = archivos[66:]
 #    archivos = [a for a in archivos if "10066" in a]
     # print( archivos ) # Para probar
 
