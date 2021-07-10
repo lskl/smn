@@ -74,7 +74,7 @@ def leer_smn_encabezado(archivo):
             est_longitud = renglon.split(':')[1].strip().strip('\n')
         elif(re.search(r"\AALTITUD",renglon)):
             est_altitud = renglon.split(':')[1].strip().strip('\n')
-        elif (re.search(r"\AEMISION",renglon)):
+        elif (re.search(r"\AEMISI",renglon)):
             est_emision = renglon.split(':')[1].strip().strip('\n')
 
     est_latitud = est_latitud.split('°')[0]  # elimina "°"
